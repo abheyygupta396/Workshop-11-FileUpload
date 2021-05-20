@@ -3,8 +3,12 @@ var router = express.Router();
 const app = express();
 const user = require('./schema');
 const jwt = require('jsonwebtoken');
+var fileUpload = require('express-fileupload');
+var upload = require('./multer');
 
+// var ObjectId = require('mongodb').ObjectId;
 
+app.use(fileUpload());
 
 // Sample to check api working.
 router.get('/', function (req, res, next) {
@@ -91,10 +95,63 @@ router.post('/profile', function (req, res, next) {
   const token = req.headers.authorization.split(" ")[1];
   const user = jwt.verify(token, 'secret');
   if (req.user = user) {
-      // console.log(token);
-      res.status(200).json({ user: 'logged in Succesfully' })
-      //jwt.decode()
+    // console.log(token);
+    res.status(200).json({ user: 'logged in Succesfully' })
+    //jwt.decode()
   }
 });
 
+
+
+//1) delete-file: Request Type: DELETE. It should be able to delete a given file ID. 
+
+router.delete('/:userId', function (req, res, next) {
+
+  user.remove({ _id: req.params.userId })
+    .exec()
+    .then(result => {
+      res.status(200).json({ user: 'deleted Successfully' })
+    })
+
+    .catch(err => {
+      console.log("error");
+      res.status(500).json({ error: err });
+    });
+
+});
+
+
+// 2) upload: Request Type: POST.  It should only be able to take a file type JPEG/PNG with size limit of 1mb. The api will return a file object with ID which is saved on the server.
+
+router.post('/upload', upload.single('image'), function (req, res, next) {
+  res.send({
+    success: true,
+    message: 'file uploaded successfully',
+    file: req.file
+  });
+  
+});
+
+// 3) Rename-file: Request Type: PUT. Ot should take a file ID and newName of the file. The code should rename the file. 
+
+router.put('/:userId', function (req, res, next) {
+
+  user.updateOne(
+    { _id: req.params.userId },
+
+    {
+      $set: { username, password } = req.body,
+    }
+  )
+    .then((result) => {
+      res.status(200).json(result)
+      console.log(result);
+    }).catch((err) => { console.log(err) })
+
+});
+
+
+
 module.exports = router;
+
+
