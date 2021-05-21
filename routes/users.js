@@ -105,6 +105,52 @@ router.post('/profile', function (req, res, next) {
   }
 });
 
+//1) delete-file: Request Type: DELETE. It should be able to delete a given file ID. 
+
+router.delete('/:userId', function (req, res, next) {
+
+  user.remove({ _id: req.params.userId })
+    .exec()
+    .then(result => {
+      res.status(200).json({ user: 'deleted Successfully' })
+    })
+
+    .catch(err => {
+      console.log("error");
+      res.status(500).json({ error: err });
+    });
+
+});
+
+
+// 2) upload: Request Type: POST. The api will return a file object with ID which is saved on the server.
+
+router.post('/upload', upload.single('image'), function (req, res, next) {
+  res.send({
+    success: true,
+    message: 'file uploaded successfully',
+    file: req.file
+  });
+
+});
+
+// 3) Rename-file: Request Type: PUT. Ot should take a file ID and newName of the file. The code should rename the file. 
+
+router.put('/:userId', function (req, res, next) {
+
+  user.updateOne(
+    { _id: req.params.userId },
+
+    {
+      $set: { username, password } = req.body,
+    }
+  )
+    .then((result) => {
+      res.status(200).json(result)
+      console.log(result);
+    }).catch((err) => { console.log(err) })
+
+});
 
 // Workshop: 12 :
 // 1) MongoDB: Pagination & Sorting:
